@@ -177,7 +177,7 @@ async function getDemandReportPreview(req, res) {
     }
 
     // Get the demand data
-    const response = await fetch(`http://localhost:5000/api/demand-data?deviceId=${deviceId}&startDate=${startDate}&endDate=${endDate}&timePeriod=${timePeriod}`);
+    const response = await fetch(`http://98.70.25.143:5000/api/demand-data?deviceId=${deviceId}&startDate=${startDate}&endDate=${endDate}&timePeriod=${timePeriod}`);
     const data = await response.json();
 
     // Get template data
@@ -207,7 +207,7 @@ async function generatePdf(req, res) {
     }
 
     // Get the demand data
-    const apiUrl = `http://localhost:5000/api/demand-data?deviceId=${deviceId}&startDate=${startDate}&endDate=${endDate}&timePeriod=${timePeriod}`;
+    const apiUrl = `http://98.70.25.143:5000/api/demand-data?deviceId=${deviceId}&startDate=${startDate}&endDate=${endDate}&timePeriod=${timePeriod}`;
     const response = await fetch(apiUrl);
     const data = await response.json();
 
@@ -310,7 +310,7 @@ async function generateCsv(req, res) {
     }
 
     // Get the demand data
-    const apiUrl = `http://localhost:5000/api/demand-data?deviceId=${deviceId}&startDate=${startDate}&endDate=${endDate}&timePeriod=${timePeriod}`;
+    const apiUrl = `http://98.70.25.143:5000/api/demand-data?deviceId=${deviceId}&startDate=${startDate}&endDate=${endDate}&timePeriod=${timePeriod}`;
     const response = await fetch(apiUrl);
     const data = await response.json();
 

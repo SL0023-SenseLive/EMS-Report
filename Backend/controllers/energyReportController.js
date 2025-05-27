@@ -138,7 +138,7 @@ async function getReportPreview(req, res) {
     }
 
     // Get the energy data using the existing endpoint
-    const response = await fetch(`http://localhost:5000/api/energy-data?deviceId=${deviceId}&startDate=${startDate}&endDate=${endDate}&timePeriod=${timePeriod}`);
+    const response = await fetch(`http://98.70.25.143:5000/api/energy-data?deviceId=${deviceId}&startDate=${startDate}&endDate=${endDate}&timePeriod=${timePeriod}`);
     const data = await response.json();
 
     // Calculate summary statistics
@@ -240,7 +240,7 @@ async function generatePdf(req, res) {
     }
 
     // Get the energy data using the existing endpoint
-    const apiUrl = `http://localhost:5000/api/energy-data?deviceId=${deviceId}&startDate=${startDate}&endDate=${endDate}&timePeriod=${timePeriod}`;
+    const apiUrl = `http://98.70.25.143:5000/api/energy-data?deviceId=${deviceId}&startDate=${startDate}&endDate=${endDate}&timePeriod=${timePeriod}`;
     const response = await fetch(apiUrl);
     const data = await response.json();
 
@@ -280,7 +280,7 @@ async function generateCsv(req, res) {
     }
 
     // Get the energy data using the existing endpoint
-    const apiUrl = `http://localhost:5000/api/energy-data?deviceId=${deviceId}&startDate=${startDate}&endDate=${endDate}&timePeriod=${timePeriod}`;
+    const apiUrl = `http://98.70.25.143:5000/api/energy-data?deviceId=${deviceId}&startDate=${startDate}&endDate=${endDate}&timePeriod=${timePeriod}`;
     const response = await fetch(apiUrl);
     const data = await response.json();
 

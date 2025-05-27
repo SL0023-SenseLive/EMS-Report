@@ -13,7 +13,7 @@ dotenv.config();
 const PORT = process.env.PORT || 5000;
 
 // CORS Configuration
-const allowedOrigins = ['http://localhost:5000', 'http://localhost:4200']; // Update with your actual allowed origins
+const allowedOrigins = ['http://localhost:5000', 'http://localhost:4200','http://98.70.25.143:5000']; // Update with your actual allowed origins
 
 app.use(cors({
   origin: function(origin, callback) {

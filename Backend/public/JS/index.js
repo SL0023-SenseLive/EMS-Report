@@ -2,7 +2,7 @@
 
 // Constants
 // const API_BASE_URL = 'http://98.70.25.143:8080';
-const API_BASE_URL = 'http://localhost:5000';
+const API_BASE_URL = 'http://98.70.25.143:5000';
 const API_ENDPOINTS = {
     DEVICES: `${API_BASE_URL}/api/devices`,
     ENERGY_DATA: `${API_BASE_URL}/api/energy-data`,
