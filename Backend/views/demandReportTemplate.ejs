@@ -1,0 +1,559 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Demand Analysis Report</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            color: #2c3e50;
+            background: white;
+        }
+
+        .report-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+           
+            border-radius: 15px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            
+            overflow: hidden;
+        }
+
+        .report-header {
+            background: linear-gradient(135deg, #2E86C1 0%, #3498DB 100%);
+            color: white;
+            padding: 40px;
+            text-align: center;
+            position: relative;
+           
+        }
+
+        .report-header::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><defs><pattern id="grain" width="100" height="100" patternUnits="userSpaceOnUse"><circle cx="25" cy="25" r="1" fill="rgba(255,255,255,0.1)"/><circle cx="75" cy="75" r="1" fill="rgba(255,255,255,0.1)"/><circle cx="50" cy="10" r="0.5" fill="rgba(255,255,255,0.1)"/></pattern></defs><rect width="100" height="100" fill="url(%23grain)"/></svg>');
+            opacity: 0.3;
+        }
+
+        .report-header h1 {
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+            font-weight: 700;
+            position: relative;
+            z-index: 1;
+        }
+
+        .report-subtitle {
+            font-size: 1.1rem;
+            opacity: 0.9;
+            position: relative;
+            z-index: 1;
+        }
+
+        .device-info {
+            background: #f8f9fa;
+            border-left: 5px solid #2E86C1;
+            padding: 25px;
+            margin: 20px;
+            border-radius: 8px;
+
+          
+        }
+
+        .device-info h3 {
+            color: #2E86C1;
+            margin-bottom: 15px;
+            font-size: 1.3rem;
+        }
+
+        .info-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 15px;
+        }
+
+        .info-item {
+            display: flex;
+            align-items: center;
+            padding: 10px;
+            background: white;
+            border-radius: 6px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+
+        .info-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #2E86C1, #3498DB);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-right: 15px;
+            color: white;
+            font-weight: bold;
+            font-size: 12px;
+        }
+
+        .kpi-section {
+            padding: 30px;
+            background: #f8f9fa;
+           
+        }
+
+        .kpi-title {
+            text-align: center;
+            margin-bottom: 30px;
+            color: #2c3e50;
+            font-size: 1.8rem;
+            position: relative;
+        }
+
+        .kpi-title::after {
+            content: '';
+            position: absolute;
+            bottom: -10px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 80px;
+            height: 3px;
+            background: linear-gradient(90deg, #2E86C1, #3498DB);
+            border-radius: 2px;
+        }
+
+        .kpi-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .kpi-card {
+            background: white;
+            border-radius: 12px;
+            padding: 25px;
+            box-shadow: 0 8px 16px rgba(0,0,0,0.1);
+            position: relative;
+            overflow: hidden;
+           
+        }
+
+        
+        .kpi-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 12px 24px rgba(0,0,0,0.15);
+        }
+       
+
+        .kpi-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: var(--card-color);
+        }
+
+        .kpi-card.success {
+            --card-color: #27AE60;
+        }
+
+        .kpi-card.danger {
+            --card-color: #E74C3C;
+        }
+
+        .kpi-card.warning {
+            --card-color: #F39C12;
+        }
+
+        .kpi-card.info {
+            --card-color: #2E86C1;
+        }
+
+        .kpi-label {
+            font-size: 0.9rem;
+            color: #7f8c8d;
+            margin-bottom: 10px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .kpi-value {
+            font-size: 2.2rem;
+            font-weight: 700;
+            color: var(--card-color);
+            margin-bottom: 5px;
+        }
+
+        .kpi-unit {
+            font-size: 0.8rem;
+            color: #95a5a6;
+        }
+
+        .chart-section {
+            padding: 30px;
+            background: white;
+        }
+
+        .chart-title {
+            text-align: center;
+            margin-bottom: 30px;
+            color: #2c3e50;
+            font-size: 1.6rem;
+        }
+
+        .chart-container {
+            background: #f8f9fa;
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 30px;
+            overflow-x: auto;
+        }
+
+        .data-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+        }
+
+        .data-table th {
+            background: linear-gradient(135deg, #2E86C1, #3498DB);
+            color: white;
+            padding: 15px 10px;
+            text-align: center;
+            font-weight: 600;
+            font-size: 0.9rem;
+        }
+
+        .data-table td {
+            padding: 12px 10px;
+            text-align: center;
+            border-bottom: 1px solid #ecf0f1;
+            font-size: 0.85rem;
+        }
+
+        .data-table tbody tr:nth-child(even) {
+            background: #f8f9fa;
+        }
+
+       
+        .data-table tbody tr:hover {
+            background: #e3f2fd;
+            transform: scale(1.02);
+            transition: all 0.2s ease;
+        }
+        
+        .footer {
+            background: #2c3e50;
+            color: white;
+            text-align: center;
+            padding: 20px;
+            font-size: 0.9rem;
+        }
+
+        .analysis-insights {
+            padding: 30px;
+            background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+           
+        }
+
+        .insights-title {
+            color: #2c3e50;
+            font-size: 1.6rem;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+
+        .insight-cards {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+        }
+
+        .insight-card {
+            background: white;
+            border-radius: 10px;
+            padding: 20px;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+            border-left: 4px solid #2E86C1;
+            
+        }
+
+        .insight-card h4 {
+            color: #2E86C1;
+            margin-bottom: 10px;
+        }
+
+        .insight-card p {
+            color: #555;
+            font-size: 0.9rem;
+        }
+
+        /* PDF-specific styles */
+       
+        @page {
+            margin: 20mm 15mm;
+            size: A4;
+        }
+        
+        .page-break {
+            page-break-before: always;
+        }
+        
+        .no-break {
+            page-break-inside: avoid;
+        }
+        
+        .data-table {
+            font-size: 0.75rem;
+        }
+        
+        .data-table th,
+        .data-table td {
+            padding: 8px 5px;
+        }
+        
+
+        @media (max-width: 768px) {
+            .report-container {
+                margin: 10px;
+                border-radius: 10px;
+            }
+            
+            .report-header {
+                padding: 20px;
+            }
+            
+            .report-header h1 {
+                font-size: 1.8rem;
+            }
+            
+            .kpi-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .data-table {
+                font-size: 0.75rem;
+            }
+            
+            .data-table th,
+            .data-table td {
+                padding: 8px 5px;
+            }
+        }
+
+      
+        .print-styles {
+            display: none;
+        }
+
+        @media print {
+            body {
+                background: white;
+                padding: 0;
+            }
+            
+            .report-container {
+                box-shadow: none;
+                border-radius: 0;
+            }
+            
+            .kpi-card:hover {
+                transform: none;
+            }
+            
+            .data-table tbody tr:hover {
+                transform: none;
+            }
+        }
+       
+    </style>
+</head>
+<body>
+    <div class="report-container">
+        <!-- Header Section -->
+        <div class="report-header">
+            <h1>DEMAND ANALYSIS REPORT</h1>
+            <p class="report-subtitle">Comprehensive Power Demand Analysis & Performance Metrics</p>
+        </div>
+
+        <!-- Device Information -->
+        <div class="device-info">
+            <h3>Device Information</h3>
+            <div class="info-grid">
+                <div class="info-item">
+                    <div class="info-icon">DEV</div>
+                    <div>
+                        <strong>Device Name:</strong> <%= deviceName %>
+                    </div>
+                </div>
+                <div class="info-item">
+                    <div class="info-icon">ID</div>
+                    <div>
+                        <strong>Device ID:</strong> <%= deviceId %>
+                    </div>
+                </div>
+                <div class="info-item">
+                    <div class="info-icon">📅</div>
+                    <div>
+                        <strong>Start Date:</strong> <%= formattedStartDate %>
+                    </div>
+                </div>
+                <div class="info-item">
+                    <div class="info-icon">📅</div>
+                    <div>
+                        <strong>End Date:</strong> <%= formattedEndDate %>
+                    </div>
+                </div>
+                <div class="info-item">
+                    <div class="info-icon">⏱️</div>
+                    <div>
+                        <strong>Time Period:</strong> <%= timePeriod %>
+                    </div>
+                </div>
+                <div class="info-item">
+                    <div class="info-icon">📊</div>
+                    <div>
+                        <strong>Total Records:</strong> <%= data.length %>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- KPI Section -->
+        <div class="kpi-section">
+            <h2 class="kpi-title">Key Performance Indicators</h2>
+            <div class="kpi-grid">
+                <div class="kpi-card success">
+                    <div class="kpi-label">Average KW Demand</div>
+                    <div class="kpi-value"><%= avgKWDemand %></div>
+                    <div class="kpi-unit">kW</div>
+                </div>
+                <div class="kpi-card danger">
+                    <div class="kpi-label">Maximum KW Demand</div>
+                    <div class="kpi-value"><%= maxKWDemand %></div>
+                    <div class="kpi-unit">kW</div>
+                </div>
+                <div class="kpi-card info">
+                    <div class="kpi-label">Average Power Factor</div>
+                    <div class="kpi-value"><%= avgPowerFactor %></div>
+                    <div class="kpi-unit">PF</div>
+                </div>
+                <div class="kpi-card warning">
+                    <div class="kpi-label">Peak Demand Period</div>
+                    <div class="kpi-value" style="font-size: 1.5rem;"><%= peakDemandPeriod %></div>
+                    <div class="kpi-unit">Date</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Analysis Insights -->
+        <div class="analysis-insights">
+            <h2 class="insights-title">Analysis Insights</h2>
+            <div class="insight-cards">
+                <div class="insight-card">
+                    <h4>Power Quality Assessment</h4>
+                    <p>
+                        The average power factor of <%= avgPowerFactor %> indicates 
+                        <% if (parseFloat(avgPowerFactor) >= 0.95) { %>
+                            excellent power quality with efficient energy utilization.
+                        <% } else if (parseFloat(avgPowerFactor) >= 0.85) { %>
+                            good power quality, though there's room for improvement.
+                        <% } else { %>
+                            poor power quality that may require corrective measures.
+                        <% } %>
+                    </p>
+                </div>
+                <div class="insight-card">
+                    <h4>Demand Variability</h4>
+                    <p>
+                        Peak demand of <%= maxKWDemand %> kW occurred on <%= peakDemandPeriod %>, 
+                        representing a <%= ((parseFloat(maxKWDemand) - parseFloat(avgKWDemand)) / parseFloat(avgKWDemand) * 100).toFixed(1) %>% 
+                        increase above average demand.
+                    </p>
+                </div>
+                <div class="insight-card">
+                    <h4>Energy Efficiency</h4>
+                    <p>
+                        Based on the <%= timePeriod.toLowerCase() %> analysis pattern, 
+                        the system shows consistent demand patterns with 
+                        <%= data.length %> data points analyzed over the reporting period.
+                    </p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Data Table Section -->
+        <div class="chart-section">
+            <h2 class="chart-title">Detailed Demand Data</h2>
+            <div class="chart-container">
+                <table class="data-table">
+                    <thead>
+                        <tr>
+                            <th>Period</th>
+                            <th>KW Demand</th>
+                            <th>KVA Demand</th>
+                            <th>KVAR Demand</th>
+                            <th>KW Max</th>
+                            <th>KVA Max</th>
+                            <th>KVAR Max</th>
+                            <th>Power Factor</th>
+                            <th>Frequency</th>
+                            <th>Current A</th>
+                            <th>Current B</th>
+                            <th>Current C</th>
+                            <th>Voltage AN</th>
+                            <th>Voltage BN</th>
+                            <th>Voltage CN</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <% data.forEach(function(row) { %>
+                        <tr>
+                            <td><%= row.period %></td>
+                            <td><%= row.KW_Demand %></td>
+                            <td><%= row.KVA_Demand %></td>
+                            <td><%= row.KVAR_Demand %></td>
+                            <td><%= row.KW_Max_Demand %></td>
+                            <td><%= row.KVA_Max_Demand %></td>
+                            <td><%= row.KVAR_Max_Demand %></td>
+                            <td><%= row.Power_Factor %></td>
+                            <td><%= row.Frequency %></td>
+                            <td><%= row.Current_A %></td>
+                            <td><%= row.Current_B %></td>
+                            <td><%= row.Current_C %></td>
+                            <td><%= row.Voltage_AN %></td>
+                            <td><%= row.Voltage_BN %></td>
+                            <td><%= row.Voltage_CN %></td>
+                        </tr>
+                        <% }); %>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- Footer -->
+        <div class="footer">
+            <p>&copy; <%= new Date().getFullYear() %> Power Management System | Generated on <%= new Date().toLocaleDateString() %></p>
+        </div>
+    </div>
+</body>
+</html>

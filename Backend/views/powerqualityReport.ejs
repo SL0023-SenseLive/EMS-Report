@@ -1,0 +1,605 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Power Quality Report</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            color: #2c3e50;
+            background: white;
+        }
+
+        .report-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            overflow: hidden;
+        }
+
+        .report-header {
+            background: linear-gradient(135deg, #8E44AD 0%, #9B59B6 100%);
+            color: white;
+            padding: 40px;
+            text-align: center;
+            position: relative;
+        }
+
+        .report-header::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><defs><pattern id="grain" width="100" height="100" patternUnits="userSpaceOnUse"><circle cx="25" cy="25" r="1" fill="rgba(255,255,255,0.1)"/><circle cx="75" cy="75" r="1" fill="rgba(255,255,255,0.1)"/><circle cx="50" cy="10" r="0.5" fill="rgba(255,255,255,0.1)"/></pattern></defs><rect width="100" height="100" fill="url(%23grain)"/></svg>');
+            opacity: 0.3;
+        }
+
+        .report-header h1 {
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+            font-weight: 700;
+            position: relative;
+            z-index: 1;
+        }
+
+        .report-subtitle {
+            font-size: 1.1rem;
+            opacity: 0.9;
+            position: relative;
+            z-index: 1;
+        }
+
+        .device-info {
+            background: #f8f9fa;
+            border-left: 5px solid #8E44AD;
+            padding: 25px;
+            margin: 20px;
+            border-radius: 8px;
+        }
+
+        .device-info h3 {
+            color: #8E44AD;
+            margin-bottom: 15px;
+            font-size: 1.3rem;
+        }
+
+        .info-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 15px;
+        }
+
+        .info-item {
+            display: flex;
+            align-items: center;
+            padding: 10px;
+            background: white;
+            border-radius: 6px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+
+        .info-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #8E44AD, #9B59B6);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-right: 15px;
+            color: white;
+            font-weight: bold;
+            font-size: 12px;
+        }
+
+        .quality-section {
+            padding: 30px;
+            background: #f8f9fa;
+        }
+
+        .quality-title {
+            text-align: center;
+            margin-bottom: 30px;
+            color: #2c3e50;
+            font-size: 1.8rem;
+            position: relative;
+        }
+
+        .quality-title::after {
+            content: '';
+            position: absolute;
+            bottom: -10px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 80px;
+            height: 3px;
+            background: linear-gradient(90deg, #8E44AD, #9B59B6);
+            border-radius: 2px;
+        }
+
+        .quality-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .quality-card {
+            background: white;
+            border-radius: 12px;
+            padding: 25px;
+            box-shadow: 0 8px 16px rgba(0,0,0,0.1);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .quality-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 12px 24px rgba(0,0,0,0.15);
+        }
+
+        .quality-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: var(--card-color);
+        }
+
+        .quality-card.excellent {
+            --card-color: #27AE60;
+        }
+
+        .quality-card.good {
+            --card-color: #2E86C1;
+        }
+
+        .quality-card.warning {
+            --card-color: #F39C12;
+        }
+
+        .quality-card.critical {
+            --card-color: #E74C3C;
+        }
+
+        .quality-label {
+            font-size: 0.9rem;
+            color: #7f8c8d;
+            margin-bottom: 10px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .quality-value {
+            font-size: 2.2rem;
+            font-weight: 700;
+            color: var(--card-color);
+            margin-bottom: 5px;
+        }
+
+        .quality-unit {
+            font-size: 0.8rem;
+            color: #95a5a6;
+        }
+
+        .chart-section {
+            padding: 30px;
+            background: white;
+        }
+
+        .chart-title {
+            text-align: center;
+            margin-bottom: 30px;
+            color: #2c3e50;
+            font-size: 1.6rem;
+        }
+
+        .chart-container {
+            background: #f8f9fa;
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 30px;
+            overflow-x: auto;
+        }
+
+        .data-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+        }
+
+        .data-table th {
+            background: linear-gradient(135deg, #8E44AD, #9B59B6);
+            color: white;
+            padding: 15px 10px;
+            text-align: center;
+            font-weight: 600;
+            font-size: 0.9rem;
+        }
+
+        .data-table td {
+            padding: 12px 10px;
+            text-align: center;
+            border-bottom: 1px solid #ecf0f1;
+            font-size: 0.85rem;
+        }
+
+        .data-table tbody tr:nth-child(even) {
+            background: #f8f9fa;
+        }
+
+        .data-table tbody tr:hover {
+            background: #e8d5f0;
+            transform: scale(1.02);
+            transition: all 0.2s ease;
+        }
+
+        .footer {
+            background: #2c3e50;
+            color: white;
+            text-align: center;
+            padding: 20px;
+            font-size: 0.9rem;
+        }
+
+        .analysis-insights {
+            padding: 30px;
+            background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+        }
+
+        .insights-title {
+            color: #2c3e50;
+            font-size: 1.6rem;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+
+        .insight-cards {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+        }
+
+        .insight-card {
+            background: white;
+            border-radius: 10px;
+            padding: 20px;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+            border-left: 4px solid #8E44AD;
+        }
+
+        .insight-card h4 {
+            color: #8E44AD;
+            margin-bottom: 10px;
+        }
+
+        .insight-card p {
+            color: #555;
+            font-size: 0.9rem;
+        }
+
+        .status-indicator {
+            display: inline-block;
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            margin-right: 8px;
+        }
+
+        .status-excellent { background-color: #27AE60; }
+        .status-good { background-color: #2E86C1; }
+        .status-warning { background-color: #F39C12; }
+        .status-critical { background-color: #E74C3C; }
+
+        /* PDF-specific styles */
+        @page {
+            margin: 20mm 15mm;
+            size: A4;
+        }
+        
+        .page-break {
+            page-break-before: always;
+        }
+        
+        .no-break {
+            page-break-inside: avoid;
+        }
+        
+        .data-table {
+            font-size: 0.75rem;
+        }
+        
+        .data-table th,
+        .data-table td {
+            padding: 8px 5px;
+        }
+
+        @media (max-width: 768px) {
+            .report-container {
+                margin: 10px;
+                border-radius: 10px;
+            }
+            
+            .report-header {
+                padding: 20px;
+            }
+            
+            .report-header h1 {
+                font-size: 1.8rem;
+            }
+            
+            .quality-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .data-table {
+                font-size: 0.75rem;
+            }
+            
+            .data-table th,
+            .data-table td {
+                padding: 8px 5px;
+            }
+        }
+
+        .print-styles {
+            display: none;
+        }
+
+        @media print {
+            body {
+                background: white;
+                padding: 0;
+            }
+            
+            .report-container {
+                box-shadow: none;
+                border-radius: 0;
+            }
+            
+            .quality-card:hover {
+                transform: none;
+            }
+            
+            .data-table tbody tr:hover {
+                transform: none;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="report-container">
+        <!-- Header Section -->
+        <div class="report-header">
+            <h1>POWER QUALITY REPORT</h1>
+            <p class="report-subtitle">Comprehensive Power Quality Analysis & Performance Metrics</p>
+        </div>
+
+        <!-- Device Information -->
+        <div class="device-info">
+            <h3>Device Information</h3>
+            <div class="info-grid">
+                <div class="info-item">
+                    <div class="info-icon">DEV</div>
+                    <div>
+                        <strong>Device Name:</strong> <%= deviceName %>
+                    </div>
+                </div>
+                <div class="info-item">
+                    <div class="info-icon">ID</div>
+                    <div>
+                        <strong>Device ID:</strong> <%= deviceId %>
+                    </div>
+                </div>
+                <div class="info-item">
+                    <div class="info-icon">📅</div>
+                    <div>
+                        <strong>Start Date:</strong> <%= formattedStartDate %>
+                    </div>
+                </div>
+                <div class="info-item">
+                    <div class="info-icon">📅</div>
+                    <div>
+                        <strong>End Date:</strong> <%= formattedEndDate %>
+                    </div>
+                </div>
+                <div class="info-item">
+                    <div class="info-icon">⏱️</div>
+                    <div>
+                        <strong>Time Period:</strong> <%= timePeriod %>
+                    </div>
+                </div>
+                <div class="info-item">
+                    <div class="info-icon">📊</div>
+                    <div>
+                        <strong>Total Records:</strong> <%= data.length %>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Quality Metrics Section -->
+        <div class="quality-section">
+            <h2 class="quality-title">Power Quality Indicators</h2>
+            <div class="quality-grid">
+                <div class="quality-card <%= voltageStatus %>">
+                    <div class="quality-label">Average Voltage</div>
+                    <div class="quality-value"><%= avgVoltage %></div>
+                    <div class="quality-unit">V</div>
+                </div>
+                <div class="quality-card <%= frequencyStatus %>">
+                    <div class="quality-label">Average Frequency</div>
+                    <div class="quality-value"><%= avgFrequency %></div>
+                    <div class="quality-unit">Hz</div>
+                </div>
+                <div class="quality-card <%= powerFactorStatus %>">
+                    <div class="quality-label">Average Power Factor</div>
+                    <div class="quality-value"><%= avgPowerFactor %></div>
+                    <div class="quality-unit">PF</div>
+                </div>
+                <div class="quality-card <%= thdStatus %>">
+                    <div class="quality-label">Total Harmonic Distortion</div>
+                    <div class="quality-value"><%= avgTHD %></div>
+                    <div class="quality-unit">%</div>
+                </div>
+                <div class="quality-card <%= voltageUnbalanceStatus %>">
+                    <div class="quality-label">Voltage Unbalance</div>
+                    <div class="quality-value"><%= maxVoltageUnbalance %></div>
+                    <div class="quality-unit">%</div>
+                </div>
+                <div class="quality-card <%= currentUnbalanceStatus %>">
+                    <div class="quality-label">Current Unbalance</div>
+                    <div class="quality-value"><%= maxCurrentUnbalance %></div>
+                    <div class="quality-unit">%</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Analysis Insights -->
+        <div class="analysis-insights">
+            <h2 class="insights-title">Power Quality Analysis</h2>
+            <div class="insight-cards">
+                <div class="insight-card">
+                    <h4>
+                        <span class="status-indicator status-<%= voltageStatus %>"></span>
+                        Voltage Quality Assessment
+                    </h4>
+                    <p>
+                        Average voltage of <%= avgVoltage %>V is 
+                        <% if (voltageStatus === 'excellent') { %>
+                            within excellent parameters, indicating stable power supply.
+                        <% } else if (voltageStatus === 'good') { %>
+                            within acceptable range with minor variations.
+                        <% } else if (voltageStatus === 'warning') { %>
+                            showing some variations that require monitoring.
+                        <% } else { %>
+                            outside acceptable range, requiring immediate attention.
+                        <% } %>
+                    </p>
+                </div>
+                <div class="insight-card">
+                    <h4>
+                        <span class="status-indicator status-<%= frequencyStatus %>"></span>
+                        Frequency Stability
+                    </h4>
+                    <p>
+                        Frequency stability at <%= avgFrequency %>Hz indicates 
+                        <% if (frequencyStatus === 'excellent') { %>
+                            excellent grid synchronization and stable power quality.
+                        <% } else if (frequencyStatus === 'good') { %>
+                            good grid stability with minor fluctuations.
+                        <% } else if (frequencyStatus === 'warning') { %>
+                            some frequency variations that may affect sensitive equipment.
+                        <% } else { %>
+                            significant frequency deviations requiring investigation.
+                        <% } %>
+                    </p>
+                </div>
+                <div class="insight-card">
+                    <h4>
+                        <span class="status-indicator status-<%= powerFactorStatus %>"></span>
+                        Power Factor Analysis
+                    </h4>
+                    <p>
+                        Power factor of <%= avgPowerFactor %> shows 
+                        <% if (powerFactorStatus === 'excellent') { %>
+                            excellent energy efficiency with minimal reactive power.
+                        <% } else if (powerFactorStatus === 'good') { %>
+                            good energy efficiency with room for improvement.
+                        <% } else if (powerFactorStatus === 'warning') { %>
+                            moderate efficiency issues requiring power factor correction.
+                        <% } else { %>
+                            poor efficiency requiring immediate corrective measures.
+                        <% } %>
+                    </p>
+                </div>
+                <div class="insight-card">
+                    <h4>
+                        <span class="status-indicator status-<%= thdStatus %>"></span>
+                        Harmonic Distortion
+                    </h4>
+                    <p>
+                        THD level of <%= avgTHD %>% indicates 
+                        <% if (thdStatus === 'excellent') { %>
+                            excellent power quality with minimal harmonic pollution.
+                        <% } else if (thdStatus === 'good') { %>
+                            acceptable harmonic levels within industry standards.
+                        <% } else if (thdStatus === 'warning') { %>
+                            elevated harmonic levels requiring monitoring.
+                        <% } else { %>
+                            high harmonic distortion requiring filtering solutions.
+                        <% } %>
+                    </p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Data Table Section -->
+        <div class="chart-section">
+            <h2 class="chart-title">Detailed Power Quality Data</h2>
+            <div class="chart-container">
+                <table class="data-table">
+                    <thead>
+                        <tr>
+                            <th>Period</th>
+                            <th>Voltage AN (V)</th>
+                            <th>Voltage BN (V)</th>
+                            <th>Voltage CN (V)</th>
+                            <th>Current A (A)</th>
+                            <th>Current B (A)</th>
+                            <th>Current C (A)</th>
+                            <th>Frequency (Hz)</th>
+                            <th>Power Factor</th>
+                            <th>THD Voltage (%)</th>
+                            <th>THD Current (%)</th>
+                            <th>Voltage Unbalance (%)</th>
+                            <th>Current Unbalance (%)</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <% data.forEach(function(row) { %>
+                        <tr>
+                            <td><%= row.period %></td>
+                            <td><%= row.Voltage_AN %></td>
+                            <td><%= row.Voltage_BN %></td>
+                            <td><%= row.Voltage_CN %></td>
+                            <td><%= row.Current_A %></td>
+                            <td><%= row.Current_B %></td>
+                            <td><%= row.Current_C %></td>
+                            <td><%= row.Frequency %></td>
+                            <td><%= row.Power_Factor %></td>
+                            <td><%= row.THD_Voltage %></td>
+                            <td><%= row.THD_Current %></td>
+                            <td><%= row.Voltage_Unbalance %></td>
+                            <td><%= row.Current_Unbalance %></td>
+                        </tr>
+                        <% }); %>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- Footer -->
+        <div class="footer">
+            <p>&copy; <%= new Date().getFullYear() %> Power Management System | Generated on <%= new Date().toLocaleDateString() %></p>
+        </div>
+    </div>
+</body>
+</html>
