@@ -253,6 +253,7 @@ async function generateDemandPdfFromEjs(templateData, deviceId, startDate, endDa
 
       // Launch Puppeteer
       browser = await puppeteer.launch({
+         executablePath: '/usr/bin/chromium-browser',
         headless: true,
         args: ['--no-sandbox', '--disable-setuid-sandbox']
       });
