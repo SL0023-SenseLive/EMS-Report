@@ -602,6 +602,7 @@ async function generatePowerQualityPdfFromEjs(templateData, deviceId, startDate,
 
       // Launch Puppeteer
       browser = await puppeteer.launch({
+         executablePath: '/usr/bin/chromium-browser',
         headless: true,
         args: ['--no-sandbox', '--disable-setuid-sandbox']
       });
