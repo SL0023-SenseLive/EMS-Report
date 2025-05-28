@@ -13,19 +13,19 @@ dotenv.config();
 const PORT = process.env.PORT || 5000;
 
 // CORS Configuration
-const allowedOrigins = ['http://localhost:5000', 'http://localhost:4200','http://98.70.25.143:5000']; // Update with your actual allowed origins
+const allowedOrigins = ['http://localhost:5000', 'http://localhost:4200','http://98.70.25.143:5000','http://98.70.25.143:5000/api']; // Update with your actual allowed origins
 
-app.use(cors({
-  origin: function(origin, callback) {
-    // Allow requests with no origin (like mobile apps or curl requests)
-    if (!origin) return callback(null, true);
-    if (allowedOrigins.includes(origin)) {
-      return callback(null, true);
-    } else {
-      return callback(new Error('Not allowed by CORS'));
-    }
-  }
-}));
+// app.use(cors({
+//   origin: function(origin, callback) {
+//     // Allow requests with no origin (like mobile apps or curl requests)
+//     if (!origin) return callback(null, true);
+//     if (allowedOrigins.includes(origin)) {
+//       return callback(null, true);
+//     } else {
+//       return callback(new Error('Not allowed by CORS'));
+//     }
+//   }
+// }));
 
 
 app.use(express.json());
@@ -40,6 +40,10 @@ app.use(express.static(path.join(__dirname, 'public')));
 app.get('/test-connection', (req, res) => {
   console.log('Test connection endpoint hit');
   res.json({ message: 'Server is reachable' });
+});
+
+app.get('/report-view', (req, res) => {
+  res.render('index'); // This should be your `report.ejs` or any view you want to embed
 });
 
 
